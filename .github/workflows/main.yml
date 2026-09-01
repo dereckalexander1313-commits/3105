@@ -1,0 +1,19 @@
+name: Build IPA
+on: workflow_dispatch
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build IPA
+        run: |
+          rm -rf ThreeOneOSFive/ThreeOneOSFive-Bridging-Header.h
+          sed -i '' '/BRIDGING_HEADER/d' ThreeOneOSFive.xcodeproj/project.pbxproj || true
+          xcodebuild -project ThreeOneOSFive.xcodeproj -scheme 3105 -sdk iphoneos -archivePath app.xcarchive archive CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO -destination generic/platform=iOS
+          mkdir Payload
+          cp -R app.xcarchive/Products/Applications/*.app Payload/
+          zip -r 3105.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 3105-IPA-LISTO
+          path: 3105.ipa

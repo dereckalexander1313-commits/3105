@@ -1,39 +1,40 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var patchDraftStore: PatchDraftStore
-    @EnvironmentObject private var patchStore: PatchStore
-    @EnvironmentObject private var repositoryStore: RepositoryStore
-    @State private var tabNavigation: AppTabNavigation
-    @State private var showSettings = false
-    @State private var isLogged = UserDefaults.standard.string(forKey: "alexito_key") != nil
-
-    init() {
-        _tabNavigation = State(initialValue: AppTabNavigation())
-    }
-
     var body: some View {
-        if !isLogged {
-            AlexitoLoginView(isLogged: $isLogged)
-        } else {
-            mainApp
-        }
-    }
-    
-    var mainApp: some View {
-        ZStack {
-            Color.black.ignoresSafeArea()
-            TabView(selection: $tabNavigation.selectedTab) {
-                ForEach(AppTab.allCases) { tab in
-                    tab.view
-                        .tabItem {
-                            Label(tab.titleKey.localized, systemImage: tab.systemImage)
-                        }
-                        .tag(tab)
+        TabView {
+            // PESTAÑA 1 - HOME
+            ZStack {
+                Color.black.ignoresSafeArea()
+                VStack(spacing: 20) {
+                    Text("ALEXITO STORE")
+                        .font(.system(size: 36, weight: .black, design: .rounded))
+                        .foregroundColor(.purple)
+                        .shadow(color: .purple.opacity(0.8), radius: 15)
+                    
+                    Text("Premium Patches")
+                        .foregroundColor(.white.opacity(0.7))
+                        .font(.headline)
+
+                    Spacer()
+                    
+                    // Aqui llama tu Home real
+                    HomeView()
+                    
+                    Spacer()
                 }
+                .padding()
             }
-            .tint(Color(red: 0.58, green: 0.15, blue: 1.0))
+            .tabItem {
+                Label("Home", systemImage: "house.fill")
+            }
+
+            // PESTAÑA 2 - PATCHES (AQUI YA ESTARAN LOS 3 ARCHIVOS)
+            PatchesView()
+                .tabItem {
+                    Label("Patches", systemImage: "puzzlepiece.extension.fill")
+                }
         }
-        .preferredColorScheme(.dark)
+        .tint(Color.purple) // TODO MORADO
     }
 }

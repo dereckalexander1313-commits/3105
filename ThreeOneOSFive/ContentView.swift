@@ -6,40 +6,33 @@ struct ContentView: View {
     @EnvironmentObject private var repositoryStore: RepositoryStore
     @State private var tabNavigation: AppTabNavigation
     @State private var showSettings = false
-    
-    // --- TEMA ALEXITO ---
-    let alexitoPurple = Color(red: 0.68, green: 0.2, blue: 1.0)
-    let alexitoBlack = Color.black
+    @State private var isLogged = UserDefaults.standard.string(forKey: "alexito_key") != nil
 
     init() {
         _tabNavigation = State(initialValue: AppTabNavigation())
     }
 
     var body: some View {
+        if !isLogged {
+            AlexitoLoginView(isLogged: $isLogged)
+        } else {
+            mainApp
+        }
+    }
+    
+    var mainApp: some View {
         ZStack {
-            alexitoBlack.ignoresSafeArea()
-            VStack(spacing: 0) {
-                // Barra superior ALEXITO
-                HStack {
-                    Text("ALEXITO")
-                        .font(.system(size: 28, weight: .black))
-                        .foregroundColor(alexitoPurple)
-                    Spacer()
+            Color.black.ignoresSafeArea()
+            TabView(selection: $tabNavigation.selectedTab) {
+                ForEach(AppTab.allCases) { tab in
+                    tab.view
+                        .tabItem {
+                            Label(tab.titleKey.localized, systemImage: tab.systemImage)
+                        }
+                        .tag(tab)
                 }
-                .padding()
-                .background(alexitoBlack)
-                
-                TabView(selection: $tabNavigation.selectedTab) {
-                    ForEach(AppTab.allCases) { tab in
-                        tab.view
-                            .tabItem {
-                                Label(tab.titleKey.localized, systemImage: tab.systemImage)
-                            }
-                            .tag(tab)
-                    }
-                }
-                .tint(alexitoPurple)
             }
+            .tint(Color(red: 0.58, green: 0.15, blue: 1.0))
         }
         .preferredColorScheme(.dark)
     }

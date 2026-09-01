@@ -5,11 +5,15 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build
+      - name: List schemes
+        run: xcodebuild -list -project ThreeOneOSFive.xcodeproj
+      - name: Build IPA
         run: |
-          xcodebuild -project ThreeOneOSFive.xcodeproj -scheme ThreeOneOSFive -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO -derivedDataPath build
+          SCHEME=$(xcodebuild -list -project ThreeOneOSFive.xcodeproj | awk '/Schemes:/{flag=1; next} flag && NF{print $1; exit}')
+          echo "Usando scheme: $SCHEME"
+          xcodebuild -project ThreeOneOSFive.xcodeproj -scheme "$SCHEME" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" -derivedDataPath build
           mkdir Payload
-          cp -R build/Build/Products/Release-iphoneos/ThreeOneOSFive.app Payload
+          cp -R build/Build/Products/Release-iphoneos/*.app Payload/
           zip -r ALEXITO-STORE.ipa Payload
       - uses: actions/upload-artifact@v4
         with:

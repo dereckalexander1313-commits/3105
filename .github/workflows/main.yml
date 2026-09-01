@@ -7,11 +7,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build IPA
         run: |
-          xcodebuild -project ThreeOneOSFive.xcodeproj -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO -destination generic/platform=iOS build
+          xcodebuild -list -project ThreeOneOSFive.xcodeproj
+          xcodebuild -project ThreeOneOSFive.xcodeproj -scheme 3105 -configuration Release -sdk iphoneos -archivePath build.xcarchive archive CODE_SIGNING_ALLOWED=NO -destination generic/platform=iOS
           mkdir -p Payload
-          APP=$(find. -name "*.app" | head -n 1)
-          echo "APP $APP"
-          cp -R "$APP" Payload/
+          cp -R build.xcarchive/Products/Applications/*.app Payload/
           zip -r ThreeOneOSFive.ipa Payload
       - name: Upload IPA
         uses: actions/upload-artifact@v4

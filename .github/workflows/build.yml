@@ -1,0 +1,17 @@
+name: Build IPA
+on: [push]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: |
+          xcodebuild -project ThreeOneOSFive.xcodeproj -scheme ThreeOneOSFive -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO -derivedDataPath build
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/ThreeOneOSFive.app Payload
+          zip -r ALEXITO-STORE.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ALEXITO-STORE-IPA
+          path: ALEXITO-STORE.ipa

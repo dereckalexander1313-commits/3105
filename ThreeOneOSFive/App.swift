@@ -1,22 +1,43 @@
 import SwiftUI
 
 @main
-struct ThreeOneOSFiveApp: App {
+struct YourAppNameApp: App {
     init() {
-        let fm = FileManager.default
-        let docs = fm.urls(for:.documentDirectory, in:.userDomainMask)[0]
-        let nombres = ["AIMBOT PECHO", "HOLOGRAMA VERDE Y AMARILLO", "HOLOGRAMA BLANCO"]
-        for nombre in nombres {
-            let destino = docs.appendingPathComponent("\(nombre).3105")
-            if fm.fileExists(atPath: destino.path) { continue }
-            if let origen = Bundle.main.url(forResource: nombre, withExtension: "3105") {
-                try? fm.copyItem(at: origen, to: destino)
-            }
-        }
+        copyBundledPatches()
+        setupPurpleAppearance()
     }
+
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
+    }
+
+    func copyBundledPatches() {
+        let fileManager = FileManager.default
+        guard let docsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        let patchesDir = docsURL.appendingPathComponent("Patches", isDirectory: true)
+        try? fileManager.createDirectory(at: patchesDir, withIntermediateDirectories: true)
+
+        let bundledPatches = [
+            "com.ea.ios.simsmobile_5912fbb3-9a69-4f00-bd38-1c0ca6d04b4c_v7_9.7.9.139048.3105",
+            "com.ea.ios.simsmobile_5912fbb3-9a69-4f00-bd38-1c0ca6d04b4c_v7_9.7.0.139048.3105",
+            "com.ea.ios.simsmobile_5912fbb3-9a69-4f00-bd38-1c0ca6d04b4c_v7_9.7.1.139048.3105"
+        ]
+
+        for patchName in bundledPatches {
+            if let bundleURL = Bundle.main.url(forResource: patchName, withExtension: nil) {
+                let destURL = patchesDir.appendingPathComponent(patchName)
+                if !fileManager.fileExists(atPath: destURL.path) {
+                    try? fileManager.copyItem(at: bundleURL, to: destURL)
+                }
+            }
+        }
+    }
+
+    func setupPurpleAppearance() {
+        UINavigationBar.appearance().tintColor = UIColor.purple
+        UITabBar.appearance().tintColor = UIColor.purple
+        UIButton.appearance().tintColor = UIColor.purple
     }
 }
